@@ -3,11 +3,21 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using TodoListApi.Config;
 using TodoListApi.Endpoints;
 using TodoListApi.Models.DB;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//Logger
+var logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+ 
+Log.Logger = logger;
+ 
+builder.Host.UseSerilog();
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
