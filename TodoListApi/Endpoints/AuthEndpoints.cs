@@ -8,7 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Serilog;
 
 namespace TodoListApi.Endpoints
 {
@@ -31,14 +31,14 @@ namespace TodoListApi.Endpoints
 
         }
 
-        static async Task<IResult> Login(IConfiguration _configuration, IMapper _map,LoginRequestDTO requestDTO, UserDB _db){
+        static async Task<IResult> Login(IConfiguration _configuration, IMapper _map,LoginRequestDTO requestDTO, TodoTaskDB _db){
             User? user = await _db.Users.SingleOrDefaultAsync(x => x.UserName == requestDTO.UserName && x.Password == requestDTO.Password);
             if(user == null){
                 return Results.BadRequest("Wrong username or password");
             }
             //Generate JWT
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]!);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(
@@ -58,7 +58,7 @@ namespace TodoListApi.Endpoints
             return Results.Ok(loginResponseDTO);
         }
 
-        static async Task<IResult> Register(IMapper _map, [FromBody] RegistrationRequestDTO requestDTO, UserDB _db){
+        static async Task<IResult> Register(IMapper _map, [FromBody] RegistrationRequestDTO requestDTO, TodoTaskDB _db){
             if(await _db.Users.FirstOrDefaultAsync(x => x.Email == requestDTO.Email && x.UserName ==requestDTO.UserName ) != null){
                 return Results.BadRequest("User already exists");
             }
