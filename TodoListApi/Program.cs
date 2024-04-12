@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MySql.EntityFrameworkCore.Extensions;
 using Serilog;
 using TodoListApi.Config;
 using TodoListApi.Endpoints;
@@ -49,8 +50,10 @@ builder.Services.AddSwaggerGen(option => {
 });
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 //Database
-builder.Services.AddDbContext<TodoTaskDB>(opt => opt.UseInMemoryDatabase("TodoTaskList"));
-builder.Services.AddDbContext<UserDB>(opt => opt.UseInMemoryDatabase("UsersList"));
+builder.Services.AddDbContext<TodoTaskDB>(
+    opt => opt.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
+
 //Authentication and Authorization
 builder.Services.AddAuthentication(x => {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -61,7 +64,7 @@ builder.Services.AddAuthentication(x => {
     x.TokenValidationParameters = new TokenValidationParameters {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
-            builder.Configuration.GetValue<string>("Jwt:Key")
+            builder.Configuration.GetValue<string>("Jwt:Key")!
         )),
         ValidateIssuer = false,
         ValidateAudience = false,
