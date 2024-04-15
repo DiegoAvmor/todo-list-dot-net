@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using Serilog;
+using O9d.AspNet.FluentValidation;
 
 namespace TodoListApi.Endpoints
 {
@@ -17,6 +18,7 @@ namespace TodoListApi.Endpoints
         public static void RegisterAuthEndpoints (this WebApplication app){
 
             var LoginEndpoints = app.MapGroup("/api/auth")
+            .WithValidationFilter()
             .WithOpenApi();
 
             LoginEndpoints.MapPost("/login", Login)
@@ -58,7 +60,7 @@ namespace TodoListApi.Endpoints
             return Results.Ok(loginResponseDTO);
         }
 
-        static async Task<IResult> Register(IMapper _map, [FromBody] RegistrationRequestDTO requestDTO, TodoTaskDB _db){
+        static async Task<IResult> Register(IMapper _map, [Validate] [FromBody] RegistrationRequestDTO requestDTO, TodoTaskDB _db){
             if(await _db.Users.FirstOrDefaultAsync(x => x.Email == requestDTO.Email && x.UserName ==requestDTO.UserName ) != null){
                 return Results.BadRequest("User already exists");
             }

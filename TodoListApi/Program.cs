@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json.Serialization;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -8,6 +9,8 @@ using MySql.EntityFrameworkCore.Extensions;
 using Serilog;
 using TodoListApi.Config;
 using TodoListApi.Endpoints;
+using TodoListApi.Models.Data.DTO;
+using TodoListApi.Models.Data.Validators;
 using TodoListApi.Models.DB;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,6 +58,11 @@ builder.Services.AddAutoMapper(typeof(MappingConfig));
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options => 
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
 );
+//Add Validators
+builder.Services.AddValidatorsFromAssemblyContaining<TodoTaskValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
+builder.Services.AddScoped<IValidator<TodoTaskRequestDTO>, TodoTaskValidator>();
+builder.Services.AddScoped<IValidator<RegistrationRequestDTO>, UserValidator>();
 //Database
 builder.Services.AddDbContext<TodoTaskDB>(
     opt => opt.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"))

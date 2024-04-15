@@ -3,6 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using O9d.AspNet.FluentValidation;
 using Serilog;
 using TodoListApi.Models.Data;
 using TodoListApi.Models.Data.DTO;
@@ -16,6 +17,7 @@ namespace TodoListApi.Endpoints
 
             var LoginEndpoints = app.MapGroup("/api")
             .RequireAuthorization("User")
+            .WithValidationFilter()
             .WithOpenApi();
 
             LoginEndpoints.MapGet("/tasks", getTasks)
@@ -39,7 +41,7 @@ namespace TodoListApi.Endpoints
             .Produces<IResult>(204).Produces(404);
         }
 
-        static async Task<IResult> createTask(IMapper _map, [FromBody] TodoTaskRequestDTO requestDTO, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db)
+        static async Task<IResult> createTask(IMapper _map, [Validate] [FromBody] TodoTaskRequestDTO requestDTO, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db)
         {
             Log.Information(requestDTO.ToString());
             User user = await getUserFromToken(claimsPrincipal, _db);
@@ -109,7 +111,7 @@ namespace TodoListApi.Endpoints
             return Results.NotFound($"Task with id {id} not found");
         }
 
-        static async Task<IResult> updateTaskById(int id, [FromBody] TodoTaskRequestDTO requestDTO, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db) {
+        static async Task<IResult> updateTaskById(int id, [Validate] [FromBody] TodoTaskRequestDTO requestDTO, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db) {
             //Check if the task owner is the user from the token
             User user = await getUserFromToken(claimsPrincipal, _db);
             if (await _db.TodoTasks.FindAsync(id) is TodoTask todo)
