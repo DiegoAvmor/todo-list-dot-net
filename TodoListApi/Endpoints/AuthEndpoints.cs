@@ -31,7 +31,7 @@ namespace TodoListApi.Endpoints
 
         }
 
-        static async Task<IResult> Login(IConfiguration _configuration, IMapper _map,LoginRequestDTO requestDTO, TodoTaskDB _db){
+        static async Task<IResult> Login(IConfiguration _configuration, IMapper _map,[FromBody] LoginRequestDTO requestDTO, TodoTaskDB _db){
             User? user = await _db.Users.SingleOrDefaultAsync(x => x.UserName == requestDTO.UserName && x.Password == requestDTO.Password);
             if(user == null){
                 return Results.BadRequest("Wrong username or password");

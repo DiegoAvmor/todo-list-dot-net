@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -49,6 +50,9 @@ builder.Services.AddSwaggerGen(option => {
 
 });
 builder.Services.AddAutoMapper(typeof(MappingConfig));
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options => 
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
+);
 //Database
 builder.Services.AddDbContext<TodoTaskDB>(
     opt => opt.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"))

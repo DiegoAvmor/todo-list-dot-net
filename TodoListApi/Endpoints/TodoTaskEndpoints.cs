@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -51,15 +52,10 @@ namespace TodoListApi.Endpoints
         static async Task<IResult> getTasks(IMapper _map, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db){
             User user = await getUserFromToken(claimsPrincipal, _db);
             //TODO: Improve mapping logic from user.tasks to list<TodoTaskDTO>
-            //List<TodoTask> todoTasks = await _db.TodoTasks.FindAsync(user.UserId);
+            List<TodoTask> todoTasks = _db.TodoTasks.Include(x => x.User).Where<TodoTask>(x => x.UserId == user.UserId).ToList();
             List<TodoTaskDTO> taskDTOs = new List<TodoTaskDTO>();
-            if(user.Tasks.Count > 0){
-            foreach (var task in user.Tasks)
-            {
-                taskDTOs.Add(_map.Map<TodoTaskDTO>(task));
-            }
-            }
-            return Results.Ok(taskDTOs);
+            
+            return Results.Ok(todoTasks);
         }
 
         static async Task<IResult> getTaskById(int id, IMapper _map, TodoTaskDB _db){

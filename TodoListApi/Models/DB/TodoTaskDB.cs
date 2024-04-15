@@ -14,10 +14,11 @@ namespace TodoListApi.Models.DB
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<TodoTask>()
-        .HasOne(e => e.User)
-        .WithMany(e => e.Tasks)
-        .HasForeignKey(e => e.UserId);
+        modelBuilder.Entity<User>()
+        .HasMany(e => e.Tasks)             //TodoTask Has one User
+        .WithOne(e => e.User)              //That User has many Tasks
+        .HasForeignKey(e => e.UserId)      //UserId is the Foreign Key of User
+        .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<User>().HasData(new User(){
             UserId=1,
