@@ -11,8 +11,8 @@ using TodoListApi.Models.DB;
 namespace TodoListApi.Migrations
 {
     [DbContext(typeof(TodoTaskDB))]
-    [Migration("20240415192421_AddDataBaseMigration")]
-    partial class AddDataBaseMigration
+    [Migration("20240415210424_AddDBMigration")]
+    partial class AddDBMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,7 +24,7 @@ namespace TodoListApi.Migrations
 
             modelBuilder.Entity("TodoListApi.Models.Data.TodoTask", b =>
                 {
-                    b.Property<int>("TodoTaskId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -39,7 +39,7 @@ namespace TodoListApi.Migrations
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("TodoTaskId");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
@@ -48,7 +48,7 @@ namespace TodoListApi.Migrations
 
             modelBuilder.Entity("TodoListApi.Models.Data.User", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -68,18 +68,34 @@ namespace TodoListApi.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.HasKey("UserId");
+                    b.HasKey("Id");
 
                     b.ToTable("Users");
 
                     b.HasData(
                         new
                         {
-                            UserId = 1,
-                            Email = "diego@gmail.com",
+                            Id = 1,
+                            Email = "test1@gmail.com",
                             Password = "string",
-                            Role = "User",
-                            UserName = "Diego"
+                            Role = "user",
+                            UserName = "test1"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Email = "test2@gmail.com",
+                            Password = "string",
+                            Role = "user",
+                            UserName = "test2"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Email = "test3@gmail.com",
+                            Password = "string",
+                            Role = "admin",
+                            UserName = "test3"
                         });
                 });
 

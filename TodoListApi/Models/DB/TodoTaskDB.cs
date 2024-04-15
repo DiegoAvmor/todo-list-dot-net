@@ -21,11 +21,23 @@ namespace TodoListApi.Models.DB
         .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<User>().HasData(new User(){
-            UserId=1,
-            UserName="Diego",
-            Email="diego@gmail.com",
+            Id=1,
+            UserName="test1",
+            Email="test1@gmail.com",
             Password="string",
-            Role="User",
+            Role="user",
+        }, new User{
+            Id=2,
+            UserName="test2",
+            Email="test2@gmail.com",
+            Password="string",
+            Role="user",
+        }, new User{
+            Id=3,
+            UserName="test3",
+            Email="test3@gmail.com",
+            Password="string",
+            Role="admin",
         });
     }
         

@@ -49,7 +49,9 @@ builder.Services.AddSwaggerGen(option => {
     });
 
 });
+//Setups AutoMapper Configuration
 builder.Services.AddAutoMapper(typeof(MappingConfig));
+//Ignores Circlular Reference in Serialization
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options => 
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
 );

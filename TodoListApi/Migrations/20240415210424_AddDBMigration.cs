@@ -3,10 +3,12 @@ using MySql.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace TodoListApi.Migrations
 {
     /// <inheritdoc />
-    public partial class AddDataBaseMigration : Migration
+    public partial class AddDBMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,7 +20,7 @@ namespace TodoListApi.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     UserName = table.Column<string>(type: "longtext", nullable: false),
                     Email = table.Column<string>(type: "longtext", nullable: false),
@@ -27,7 +29,7 @@ namespace TodoListApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.UserId);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
@@ -35,7 +37,7 @@ namespace TodoListApi.Migrations
                 name: "TodoTasks",
                 columns: table => new
                 {
-                    TodoTaskId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     Title = table.Column<string>(type: "longtext", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: false),
@@ -43,20 +45,25 @@ namespace TodoListApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TodoTasks", x => x.TodoTaskId);
+                    table.PrimaryKey("PK_TodoTasks", x => x.Id);
                     table.ForeignKey(
                         name: "FK_TodoTasks_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "UserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "UserId", "Email", "Password", "Role", "UserName" },
-                values: new object[] { 1, "diego@gmail.com", "string", "User", "Diego" });
+                columns: new[] { "Id", "Email", "Password", "Role", "UserName" },
+                values: new object[,]
+                {
+                    { 1, "test1@gmail.com", "string", "user", "test1" },
+                    { 2, "test2@gmail.com", "string", "user", "test2" },
+                    { 3, "test3@gmail.com", "string", "admin", "test3" }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_TodoTasks_UserId",
