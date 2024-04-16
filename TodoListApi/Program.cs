@@ -14,6 +14,11 @@ using TodoListApi.Models.DB;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Setup Mapping from appsettings.json to the ApplicationConfig class
+var appConfig = new ApplicationConfig();
+builder.Configuration.GetSection(nameof(ApplicationConfig)).Bind(appConfig);
+builder.Services.AddSingleton(appConfig);
+
 //Logger
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
@@ -26,12 +31,12 @@ builder.Host.UseSerilog();
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option => {
-    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme{
+    option.AddSecurityDefinition(appConfig.JwtConfig.Scheme, new OpenApiSecurityScheme{
         Description ="JWT Authorization header using Bearer scheme",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Scheme = appConfig.JwtConfig.Scheme
     });
     option.AddSecurityRequirement(new OpenApiSecurityRequirement()
     {
@@ -40,10 +45,10 @@ builder.Services.AddSwaggerGen(option => {
             {
                 Reference = new OpenApiReference{
                     Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                    Id = appConfig.JwtConfig.Scheme
                 },
                 Scheme = "oauth2",
-                Name = "Bearer",
+                Name = appConfig.JwtConfig.Scheme,
                 In = ParameterLocation.Header,
             },
             new List<string>()
@@ -65,7 +70,7 @@ builder.Services.AddScoped<IValidator<TodoTaskRequestDTO>, TodoTaskValidator>();
 builder.Services.AddScoped<IValidator<RegistrationRequestDTO>, UserValidator>();
 //Database
 builder.Services.AddDbContext<TodoTaskDB>(
-    opt => opt.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")!)
+    opt => opt.UseMySQL(appConfig.DbConfig.getConnectionString())
 );
 
 //Authentication and Authorization
@@ -78,7 +83,7 @@ builder.Services.AddAuthentication(x => {
     x.TokenValidationParameters = new TokenValidationParameters {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
-            builder.Configuration.GetValue<string>("Jwt:Key")!
+            appConfig.JwtConfig.Key
         )),
         ValidateIssuer = false,
         ValidateAudience = false,

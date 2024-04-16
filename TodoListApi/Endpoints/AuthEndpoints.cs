@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using Serilog;
 using O9d.AspNet.FluentValidation;
+using TodoListApi.Config;
 
 namespace TodoListApi.Endpoints
 {
@@ -33,14 +34,14 @@ namespace TodoListApi.Endpoints
 
         }
 
-        static async Task<IResult> Login(IConfiguration _configuration, IMapper _map,[Validate] [FromBody] LoginRequestDTO requestDTO, TodoTaskDB _db){
+        static async Task<IResult> Login(ApplicationConfig _configuration, IMapper _map,[Validate] [FromBody] LoginRequestDTO requestDTO, TodoTaskDB _db){
             User? user = await _db.Users.SingleOrDefaultAsync(x => x.UserName == requestDTO.UserName && x.Password == requestDTO.Password);
             if(user == null){
                 return Results.BadRequest("Wrong username or password");
             }
             //Generate JWT
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]!);
+            var key = Encoding.ASCII.GetBytes(_configuration.JwtConfig.Key);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(
@@ -48,7 +49,7 @@ namespace TodoListApi.Endpoints
                     new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(ClaimTypes.Role, user.Role)
                 ]),
-                Expires = DateTime.UtcNow.AddMinutes(30),
+                Expires = DateTime.UtcNow.AddHours(_configuration.JwtConfig.ExpiresIn),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
