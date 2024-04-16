@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using MySql.EntityFrameworkCore.Extensions;
 using Serilog;
 using TodoListApi.Config;
 using TodoListApi.Endpoints;
@@ -61,11 +60,12 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =
 //Add Validators
 builder.Services.AddValidatorsFromAssemblyContaining<TodoTaskValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 builder.Services.AddScoped<IValidator<TodoTaskRequestDTO>, TodoTaskValidator>();
 builder.Services.AddScoped<IValidator<RegistrationRequestDTO>, UserValidator>();
 //Database
 builder.Services.AddDbContext<TodoTaskDB>(
-    opt => opt.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"))
+    opt => opt.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")!)
 );
 
 //Authentication and Authorization
