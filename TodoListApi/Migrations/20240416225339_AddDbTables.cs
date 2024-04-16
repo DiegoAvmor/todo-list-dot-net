@@ -8,7 +8,7 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace TodoListApi.Migrations
 {
     /// <inheritdoc />
-    public partial class AddDBMigration : Migration
+    public partial class AddDbTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -60,9 +60,19 @@ namespace TodoListApi.Migrations
                 columns: new[] { "Id", "Email", "Password", "Role", "UserName" },
                 values: new object[,]
                 {
-                    { 1, "test1@gmail.com", "string", "user", "test1" },
-                    { 2, "test2@gmail.com", "string", "user", "test2" },
-                    { 3, "test3@gmail.com", "string", "admin", "test3" }
+                    { 1, "test1@gmail.com", "8NAamnmoYvbfsi8FkwuCgQ==", "user", "test1" },
+                    { 2, "test2@gmail.com", "8NAamnmoYvbfsi8FkwuCgQ==", "user", "test2" },
+                    { 3, "test3@gmail.com", "8NAamnmoYvbfsi8FkwuCgQ==", "admin", "test3" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "TodoTasks",
+                columns: new[] { "Id", "Description", "Title", "UserId" },
+                values: new object[,]
+                {
+                    { 1, "This is some dummy text", "This is my task!", 1 },
+                    { 2, "This is some dummy text", "This is my task!", 2 },
+                    { 3, "This is some dummy text", "This is my task!", 3 }
                 });
 
             migrationBuilder.CreateIndex(

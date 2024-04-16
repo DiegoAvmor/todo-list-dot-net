@@ -41,6 +41,29 @@ namespace TodoListApi.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("TodoTasks");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "This is some dummy text",
+                            Title = "This is my task!",
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "This is some dummy text",
+                            Title = "This is my task!",
+                            UserId = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "This is some dummy text",
+                            Title = "This is my task!",
+                            UserId = 3
+                        });
                 });
 
             modelBuilder.Entity("TodoListApi.Models.Data.User", b =>
@@ -74,7 +97,7 @@ namespace TodoListApi.Migrations
                         {
                             Id = 1,
                             Email = "test1@gmail.com",
-                            Password = "string",
+                            Password = "8NAamnmoYvbfsi8FkwuCgQ==",
                             Role = "user",
                             UserName = "test1"
                         },
@@ -82,7 +105,7 @@ namespace TodoListApi.Migrations
                         {
                             Id = 2,
                             Email = "test2@gmail.com",
-                            Password = "string",
+                            Password = "8NAamnmoYvbfsi8FkwuCgQ==",
                             Role = "user",
                             UserName = "test2"
                         },
@@ -90,7 +113,7 @@ namespace TodoListApi.Migrations
                         {
                             Id = 3,
                             Email = "test3@gmail.com",
-                            Password = "string",
+                            Password = "8NAamnmoYvbfsi8FkwuCgQ==",
                             Role = "admin",
                             UserName = "test3"
                         });
