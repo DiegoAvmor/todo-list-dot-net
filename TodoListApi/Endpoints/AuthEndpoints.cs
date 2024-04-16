@@ -11,6 +11,8 @@ using System.Security.Claims;
 using Serilog;
 using O9d.AspNet.FluentValidation;
 using TodoListApi.Config;
+using TodoListApi.Utilities;
+using MySqlX.XDevAPI.Common;
 
 namespace TodoListApi.Endpoints
 {
@@ -25,7 +27,7 @@ namespace TodoListApi.Endpoints
             LoginEndpoints.MapPost("/login", Login)
             .WithName("Login")
             .Accepts<LoginRequestDTO>("application/json")
-            .Produces<IResult>(200).Produces(400);
+            .Produces<IResult>(200).Produces(400).Produces(404);
 
             LoginEndpoints.MapPost("/register", Register)
             .WithName("Register")
@@ -34,10 +36,15 @@ namespace TodoListApi.Endpoints
 
         }
 
-        static async Task<IResult> Login(ApplicationConfig _configuration, IMapper _map,[Validate] [FromBody] LoginRequestDTO requestDTO, TodoTaskDB _db){
-            User? user = await _db.Users.SingleOrDefaultAsync(x => x.UserName == requestDTO.UserName && x.Password == requestDTO.Password);
+        static async Task<IResult> Login(AesEncryption _encryptUtility, ApplicationConfig _configuration, IMapper _map,[Validate] [FromBody] LoginRequestDTO requestDTO, TodoTaskDB _db){
+            User? user = await _db.Users.SingleOrDefaultAsync(x => x.UserName == requestDTO.UserName &&  x.Email == requestDTO.Email);
             if(user == null){
-                return Results.BadRequest("Wrong username or password");
+                return Results.NotFound("Failed login attempt: User not found error.");
+            }
+
+            if (_encryptUtility.Decrypt(user.Password) != requestDTO.Password){
+                Log.Error("Failed login attempt: Invalid password.");
+                return Results.BadRequest("Failed login attempt: Invalid username or password.");
             }
             //Generate JWT
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -61,13 +68,15 @@ namespace TodoListApi.Endpoints
             return Results.Ok(loginResponseDTO);
         }
 
-        static async Task<IResult> Register(IMapper _map, [Validate] [FromBody] RegistrationRequestDTO requestDTO, TodoTaskDB _db){
+        static async Task<IResult> Register(AesEncryption _encryptUtility, IMapper _map, [Validate] [FromBody] RegistrationRequestDTO requestDTO, TodoTaskDB _db){
             if(await _db.Users.FirstOrDefaultAsync(x => x.Email == requestDTO.Email && x.UserName ==requestDTO.UserName ) != null){
-                return Results.BadRequest("User already exists");
+                return Results.BadRequest("Failed user registration: Usernamer or email already exists.");
             }
 
             User newUser = _map.Map<User>(requestDTO);
             newUser.Role = "user";
+            newUser.Password = _encryptUtility.Encrypt(newUser.Password);
+
             _db.Users.Add(newUser);
             _db.SaveChanges();
             UserDTO newUserDTO = _map.Map<UserDTO>(newUser);

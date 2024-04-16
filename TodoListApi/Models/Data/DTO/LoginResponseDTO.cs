@@ -4,7 +4,7 @@ namespace TodoListApi.Models.Data.DTO
     {
         public UserDTO User { get; set; }
         public string Token { get; set; }
-        public string Type = "Bearer";
+        public string Type { get; set; } = "Bearer";
         
     }
 }

@@ -20,31 +20,31 @@ namespace TodoListApi.Endpoints
             .WithValidationFilter()
             .WithOpenApi();
 
-            LoginEndpoints.MapGet("/tasks", getTasks)
+            LoginEndpoints.MapGet("/tasks", GetTasks)
             .WithName("GetTasks")
             .Produces<IResult>(200).Produces(409);
 
-            LoginEndpoints.MapPost("/tasks", createTask)
+            LoginEndpoints.MapPost("/tasks", CreateTask)
             .WithName("CreateTask")
             .Produces<IResult>(200).Produces(409);
 
-            LoginEndpoints.MapGet("/{id:int}/task", getTaskById)
+            LoginEndpoints.MapGet("/{id:int}/task", GetTaskById)
             .WithName("GetTaskById")
             .Produces<IResult>(200).Produces(404);
 
-            LoginEndpoints.MapDelete("/{id:int}/task", deleteTaskById)
+            LoginEndpoints.MapDelete("/{id:int}/task", DeleteTaskById)
             .WithName("DeleteTaskById")
             .Produces<IResult>(204).Produces(404);
 
-            LoginEndpoints.MapPut("/{id:int}/task", updateTaskById)
+            LoginEndpoints.MapPut("/{id:int}/task", UpdateTaskById)
             .WithName("UpdateTaskById")
             .Produces<IResult>(204).Produces(404);
         }
 
-        static async Task<IResult> createTask(IMapper _map, [Validate] [FromBody] TodoTaskRequestDTO requestDTO, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db)
+        static async Task<IResult> CreateTask(IMapper _map, [Validate] [FromBody] TodoTaskRequestDTO requestDTO, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db)
         {
             Log.Information(requestDTO.ToString());
-            User user = await getUserFromToken(claimsPrincipal, _db);
+            User user = await GetUserFromToken(claimsPrincipal, _db);
             if (user == null){
                 Log.Error("User in token not found, invalid user.");
                 return Results.Conflict("It wasnt possible to retrieved the data from the user");
@@ -65,8 +65,8 @@ namespace TodoListApi.Endpoints
             }
         }
 
-        static async Task<IResult> getTasks(IMapper _map, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db){
-            User user = await getUserFromToken(claimsPrincipal, _db);
+        static async Task<IResult> GetTasks(IMapper _map, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db){
+            User user = await GetUserFromToken(claimsPrincipal, _db);
             if (user == null){
                 Log.Error("User in token not found, invalid user.");
                 return Results.Conflict("It wasnt possible to retrieved the data from the user");
@@ -85,9 +85,12 @@ namespace TodoListApi.Endpoints
             return Results.Ok(userTodoTasks);
         }
 
-        static async Task<IResult> getTaskById(int id, ClaimsPrincipal claimsPrincipal, IMapper _map, TodoTaskDB _db){
+        static async Task<IResult> GetTaskById(int id, ClaimsPrincipal claimsPrincipal, IMapper _map, TodoTaskDB _db){
             //Check if the task owner is the user from the token
-            User user = await getUserFromToken(claimsPrincipal, _db);
+            User user = await GetUserFromToken(claimsPrincipal, _db);
+             if (user == null){
+                return Results.Conflict("It wasnt possible to retrieved the data from the user");
+            }
             TodoTask? todoTask = await _db.TodoTasks.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == id && x.UserId == user.Id);
             if (todoTask ==null){
                 return Results.NotFound($"Task with id {id} not found");
@@ -95,9 +98,12 @@ namespace TodoListApi.Endpoints
             return Results.Ok(_map.Map<TodoTaskResponseDTO>(todoTask));
         }
 
-        static async Task<IResult> deleteTaskById(int id, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db) {
+        static async Task<IResult> DeleteTaskById(int id, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db) {
             //Check if the task owner is the user from the token
-            User user = await getUserFromToken(claimsPrincipal, _db);
+            User user = await GetUserFromToken(claimsPrincipal, _db);
+             if (user == null){
+                return Results.Conflict("It wasnt possible to retrieved the data from the user");
+            }
             if (await _db.TodoTasks.FindAsync(id) is TodoTask todo)
             {
                 if (todo.UserId == user.Id){
@@ -111,9 +117,13 @@ namespace TodoListApi.Endpoints
             return Results.NotFound($"Task with id {id} not found");
         }
 
-        static async Task<IResult> updateTaskById(int id, [Validate] [FromBody] TodoTaskRequestDTO requestDTO, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db) {
+        static async Task<IResult> UpdateTaskById(int id, [Validate] [FromBody] TodoTaskRequestDTO requestDTO, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db) {
             //Check if the task owner is the user from the token
-            User user = await getUserFromToken(claimsPrincipal, _db);
+            User user = await GetUserFromToken(claimsPrincipal, _db);
+            if (user == null){
+                return Results.Conflict("It wasnt possible to retrieved the data from the user");
+            }
+
             if (await _db.TodoTasks.FindAsync(id) is TodoTask todo)
             {
                 if (todo.UserId == user.Id){
@@ -128,23 +138,20 @@ namespace TodoListApi.Endpoints
             return Results.NotFound($"Task with id {id} not found");
         }
 
-        private static async Task<User> getUserFromToken(ClaimsPrincipal claimsPrincipal, TodoTaskDB _db){
+        private static async Task<User> GetUserFromToken(ClaimsPrincipal claimsPrincipal, TodoTaskDB _db){
             try
             {
                 string username = claimsPrincipal.Identity.Name;
                 if (string.IsNullOrEmpty(username)){
                     throw new Exception($"No Username '{username}' associated in JWT");
                 }
-                Log.Information($"Current Request JWT User: {username}");
-                User? user = await _db.Users.FirstAsync(x => x.UserName == username);
-                if (user == null){
-                    throw new Exception($"User '{username}' Not Found");
-                }
+
+                User? user = await _db.Users.FirstAsync(x => x.UserName == username) ?? throw new Exception($"User '{username}' Not Found");
                 return user;
             }
             catch (Exception e)
             {
-                Log.Error(e.Message);
+                Log.Error($"Failed user token extration: {e.Message}");
                 return null;
             }
         }

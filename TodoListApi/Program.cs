@@ -11,6 +11,7 @@ using TodoListApi.Endpoints;
 using TodoListApi.Models.Data.DTO;
 using TodoListApi.Models.Data.Validators;
 using TodoListApi.Models.DB;
+using TodoListApi.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,10 @@ var appConfig = new ApplicationConfig();
 builder.Configuration.GetSection(nameof(ApplicationConfig)).Bind(appConfig);
 builder.Services.AddSingleton(appConfig);
 
-//Logger
+//Setup Singleto for Utilities
+builder.Services.AddSingleton<AesEncryption>();
+
+//Setup Logger
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
@@ -28,7 +32,7 @@ Log.Logger = logger;
  
 builder.Host.UseSerilog();
 
-// Add services to the container.
+//Setup Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option => {
     option.AddSecurityDefinition(appConfig.JwtConfig.Scheme, new OpenApiSecurityScheme{
@@ -56,24 +60,27 @@ builder.Services.AddSwaggerGen(option => {
     });
 
 });
-//Setups AutoMapper Configuration
+//Setup AutoMapper Configuration
 builder.Services.AddAutoMapper(typeof(MappingConfig));
-//Ignores Circlular Reference in Serialization
+
+//Setup Serialization to ignore Circular Reference
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options => 
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
 );
-//Add Validators
+
+//Setup Validators
 builder.Services.AddValidatorsFromAssemblyContaining<TodoTaskValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 builder.Services.AddScoped<IValidator<TodoTaskRequestDTO>, TodoTaskValidator>();
 builder.Services.AddScoped<IValidator<RegistrationRequestDTO>, UserValidator>();
-//Database
+
+//Setup Database Connection
 builder.Services.AddDbContext<TodoTaskDB>(
     opt => opt.UseMySQL(appConfig.DbConfig.getConnectionString())
 );
 
-//Authentication and Authorization
+//Setup Authentication and Authorization
 builder.Services.AddAuthentication(x => {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -90,6 +97,7 @@ builder.Services.AddAuthentication(x => {
     };
 });
 
+//Setup Roles Policies
 builder.Services.AddAuthorization(options => {
     options.AddPolicy("User", policy => policy.RequireRole("user"));
     options.AddPolicy("Admin", policy => policy.RequireRole("admin"));

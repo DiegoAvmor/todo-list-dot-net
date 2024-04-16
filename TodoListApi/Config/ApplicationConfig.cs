@@ -5,6 +5,13 @@ namespace TodoListApi.Config
     {
         public JwtConfig JwtConfig{ get; set; } = new JwtConfig();
         public DbConfig DbConfig{ get; set; } = new DbConfig();
+        public AesEncryptionConfig AesEncryptionConfig{ get; set; } = new AesEncryptionConfig();
+    }
+
+    public class AesEncryptionConfig
+    {
+        public string Key { get; set; }
+        public string Iv { get; set; }
     }
 
     public class JwtConfig
@@ -12,7 +19,6 @@ namespace TodoListApi.Config
         public string Key { get; set; }
         public string Scheme { get; set; }
         public int ExpiresIn { get; set; }
-
     }
 
     public class DbConfig
