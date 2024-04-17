@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using MySqlX.XDevAPI.Common;
 using O9d.AspNet.FluentValidation;
 using Serilog;
 using TodoListApi.Models.Data;

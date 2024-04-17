@@ -12,7 +12,6 @@ using Serilog;
 using O9d.AspNet.FluentValidation;
 using TodoListApi.Config;
 using TodoListApi.Utilities;
-using MySqlX.XDevAPI.Common;
 
 namespace TodoListApi.Endpoints
 {
