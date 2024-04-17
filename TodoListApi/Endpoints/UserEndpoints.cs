@@ -17,7 +17,9 @@ namespace TodoListApi.Endpoints
     public static class UserEndpoints
     {
         public static void RegisterUserManagementEndpoints(this WebApplication app){
-            var userEndpoints = app.MapGroup("/api/user")
+
+            // User role policy endpoints
+            var userEndpoints = app.MapGroup("/api/users")
             .RequireAuthorization("User")
             .WithValidationFilter()
             .WithOpenApi();
@@ -29,6 +31,16 @@ namespace TodoListApi.Endpoints
 
             userEndpoints.MapDelete("/{id:int}", DeleteUser)
             .WithName("DeleteUser")
+            .Produces<IResult>(200).Produces(404).Produces(409);
+
+            // Admin role policy endpoints
+            var adminUserEndpoints = app.MapGroup("/api/admin/users")
+            .RequireAuthorization("Admin")
+            .WithValidationFilter()
+            .WithOpenApi();
+
+            adminUserEndpoints.MapDelete("/{id:int}", AdminDeleteUser)
+            .WithName("AdminDeleteUser")
             .Produces<IResult>(200).Produces(404).Produces(409);
         }
 
@@ -49,7 +61,6 @@ namespace TodoListApi.Endpoints
             }
             Log.Error($"Failed to delete user: User with id {id} not found");
             return Results.NotFound("Failed to delete user: User not found or doesnt exist");
-            throw new NotImplementedException();
         }
 
         public static async Task<IResult> EditUser(int id, [Validate] [FromBody] RegistrationRequestDTO requestDTO, AesEncryption _encryptUtility, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db){   
@@ -72,6 +83,17 @@ namespace TodoListApi.Endpoints
             }
             Log.Error($"Failed to update user: User with id {id} not found");
             return Results.NotFound($"Failed to update user: User not found or doesnt exist");
+        }
+
+        private static async Task<IResult> AdminDeleteUser(int id, TodoTaskDB _db){
+            if (await _db.Users.FindAsync(id) is User _user)
+            {
+                _db.Users.Remove(_user);
+                await _db.SaveChangesAsync();
+                return Results.NoContent();
+            }
+            Log.Error($"Failed to delete user: User with id {id} not found");
+            return Results.NotFound("Failed to delete user: User not found or doesnt exist");
         }
 
     }
