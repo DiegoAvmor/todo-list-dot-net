@@ -43,19 +43,19 @@ namespace TodoListApi.Endpoints
 
         static async Task<IResult> CreateTask(IMapper _map, [Validate] [FromBody] TodoTaskRequestDTO requestDTO, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db)
         {
-            Log.Information(requestDTO.ToString());
             User user = await GetUserFromToken(claimsPrincipal, _db);
             if (user == null){
                 Log.Error("User in token not found, invalid user.");
                 return Results.Conflict("It wasnt possible to retrieved the data from the user");
             }
-
+            Log.Information($"Creating new task for user: {user.UserName}");
             try
             {
                 TodoTask newTask = _map.Map<TodoTask>(requestDTO);
                 newTask.UserId = user.Id;
                 _db.TodoTasks.Add(newTask);
                 await _db.SaveChangesAsync();
+                Log.Information($"New task created with id:{newTask.Id}");
                 return Results.Ok(_map.Map<TodoTaskResponseDTO>(newTask));
             }
             catch (Exception e)

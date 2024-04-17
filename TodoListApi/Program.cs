@@ -22,6 +22,7 @@ builder.Services.AddSingleton(appConfig);
 
 //Setup Singleto for Utilities
 builder.Services.AddSingleton<AesEncryption>();
+//builder.Services.AddSingleton<TokenUtility>();
 
 //Setup Logger
 var logger = new LoggerConfiguration()
@@ -115,6 +116,7 @@ if (app.Environment.IsDevelopment())
 //Register Endpoints
 app.RegisterAuthEndpoints();
 app.RegisterTodoTaskEndpoints();
+app.RegisterUserManagementEndpoints();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
