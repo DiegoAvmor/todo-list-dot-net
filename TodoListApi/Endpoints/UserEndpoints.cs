@@ -15,27 +15,26 @@ namespace TodoListApi.Endpoints
 
             // User role policy endpoints
             var userEndpoints = app.MapGroup("/api/users")
+            .WithTags("Users")
             .RequireAuthorization("User")
             .WithValidationFilter()
             .WithOpenApi();
 
             userEndpoints.MapPut("/{id:int}", EditUser)
-            .WithName("EditUser")
             .Accepts<RegistrationRequestDTO>("application/json")
             .Produces<IResult>(200).Produces(404).Produces(409);
 
             userEndpoints.MapDelete("/{id:int}", DeleteUser)
-            .WithName("DeleteUser")
             .Produces<IResult>(200).Produces(404).Produces(409);
 
             // Admin role policy endpoints
             var adminUserEndpoints = app.MapGroup("/api/admin/users")
+            .WithTags("Admin - User Management")
             .RequireAuthorization("Admin")
             .WithValidationFilter()
             .WithOpenApi();
 
             adminUserEndpoints.MapDelete("/{id:int}", AdminDeleteUser)
-            .WithName("AdminDeleteUser")
             .Produces<IResult>(200).Produces(404).Produces(409);
         }
 

@@ -20,16 +20,15 @@ namespace TodoListApi.Endpoints
         public static void RegisterAuthEndpoints (this WebApplication app){
 
             var LoginEndpoints = app.MapGroup("/api/auth")
+            .WithTags("Authentication")
             .WithValidationFilter()
             .WithOpenApi();
 
             LoginEndpoints.MapPost("/login", Login)
-            .WithName("Login")
             .Accepts<LoginRequestDTO>("application/json")
             .Produces<IResult>(200).Produces(400).Produces(404);
 
             LoginEndpoints.MapPost("/register", Register)
-            .WithName("Register")
             .Accepts<RegistrationRequestDTO>("application/json")
             .Produces<IResult>(200).Produces(400);
 
