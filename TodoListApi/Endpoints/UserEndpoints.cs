@@ -22,10 +22,10 @@ namespace TodoListApi.Endpoints
 
             userEndpoints.MapPut("/{id:int}", EditUser)
             .Accepts<RegistrationRequestDTO>("application/json")
-            .Produces<IResult>(200).Produces(404).Produces(409);
+            .Produces<IResult>(204).Produces(404).Produces(409);
 
             userEndpoints.MapDelete("/{id:int}", DeleteUser)
-            .Produces<IResult>(200).Produces(404).Produces(409);
+            .Produces<IResult>(204).Produces(404).Produces(409);
 
             // Admin role policy endpoints
             var adminUserEndpoints = app.MapGroup("/api/admin/users")
@@ -35,7 +35,7 @@ namespace TodoListApi.Endpoints
             .WithOpenApi();
 
             adminUserEndpoints.MapDelete("/{id:int}", AdminDeleteUser)
-            .Produces<IResult>(200).Produces(404).Produces(409);
+            .Produces<IResult>(204).Produces(404).Produces(409);
         }
 
         private static async Task<IResult> DeleteUser(int id, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db){

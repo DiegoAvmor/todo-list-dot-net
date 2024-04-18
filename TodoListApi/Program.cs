@@ -20,9 +20,8 @@ var appConfig = new ApplicationConfig();
 builder.Configuration.GetSection(nameof(ApplicationConfig)).Bind(appConfig);
 builder.Services.AddSingleton(appConfig);
 
-//Setup Singleto for Utilities
+//Setup Singleton for Utilities
 builder.Services.AddSingleton<AesEncryption>();
-//builder.Services.AddSingleton<TokenUtility>();
 
 //Setup Logger
 var logger = new LoggerConfiguration()
@@ -78,8 +77,13 @@ builder.Services.AddScoped<IValidator<RegistrationRequestDTO>, UserValidator>();
 
 //Setup Database Connection
 builder.Services.AddDbContext<TodoTaskDB>(
-    opt => opt.UseMySQL(appConfig.DbConfig.getConnectionString())
-);
+    opt => {
+        if(appConfig.DbConfig.Server != null){
+            opt.UseMySQL(appConfig.DbConfig.getConnectionString());
+        }else {
+            opt.UseInMemoryDatabase("TodoList");
+        }
+    });
 
 //Setup Authentication and Authorization
 builder.Services.AddAuthentication(x => {
@@ -123,3 +127,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.Run();
+
+public partial class Program { }
