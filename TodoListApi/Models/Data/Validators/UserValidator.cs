@@ -3,7 +3,7 @@ using TodoListApi.Models.Data.DTO;
 
 namespace TodoListApi.Models.Data.Validators
 {
-    public class UserValidator: AbstractValidator<RegistrationRequestDTO>
+    public class UserValidator: AbstractValidator<RegistrationRequestDto>
     {
         public UserValidator(){
             RuleFor(x=>x.Email)

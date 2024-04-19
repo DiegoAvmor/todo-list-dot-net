@@ -3,7 +3,7 @@ using TodoListApi.Models.Data.DTO;
 
 namespace TodoListApi.Models.Data.Validators
 {
-    public class LoginRequestValidator : AbstractValidator<LoginRequestDTO>
+    public class LoginRequestValidator : AbstractValidator<LoginRequestDto>
     {
         public LoginRequestValidator(){
             RuleFor(x=>x.Email)

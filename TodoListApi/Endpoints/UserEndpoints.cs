@@ -21,7 +21,7 @@ namespace TodoListApi.Endpoints
             .WithOpenApi();
 
             userEndpoints.MapPut("/{id:int}", EditUser)
-            .Accepts<RegistrationRequestDTO>("application/json")
+            .Accepts<RegistrationRequestDto>("application/json")
             .Produces<IResult>(204).Produces(404).Produces(409);
 
             userEndpoints.MapDelete("/{id:int}", DeleteUser)
@@ -40,7 +40,7 @@ namespace TodoListApi.Endpoints
 
         private static async Task<IResult> DeleteUser(int id, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db){
             //Check if the task owner is the user from the token
-            User user = await TokenUtility.GetUserFromToken(claimsPrincipal, _db);
+            User? user = await TokenUtility.GetUserFromToken(claimsPrincipal, _db);
              if (user == null){
                 return Results.Conflict("It wasnt possible to retrieved the data from the user");
             }
@@ -57,9 +57,9 @@ namespace TodoListApi.Endpoints
             return Results.NotFound("Failed to delete user: User not found or doesnt exist");
         }
 
-        public static async Task<IResult> EditUser(int id, [Validate] [FromBody] RegistrationRequestDTO requestDTO, AesEncryption _encryptUtility, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db){   
+        public static async Task<IResult> EditUser(int id, [Validate] [FromBody] RegistrationRequestDto requestDTO, AesEncryption _encryptUtility, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db){   
             //Check if the task owner is the user from the token
-            User user = await TokenUtility.GetUserFromToken(claimsPrincipal, _db);
+            User? user = await TokenUtility.GetUserFromToken(claimsPrincipal, _db);
             if (user == null){
                 return Results.Conflict("It wasnt possible to retrieved the data from the user");
             }

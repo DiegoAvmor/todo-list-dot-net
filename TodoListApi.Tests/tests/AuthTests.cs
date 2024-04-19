@@ -14,7 +14,7 @@ public class AuthTests
         var application = new WebApplicationFactory<Program>();
         client = application.CreateClient();
 
-        await client.PostAsJsonAsync("/api/auth/register", new RegistrationRequestDTO
+        await client.PostAsJsonAsync("/api/auth/register", new RegistrationRequestDto
         {
             UserName = "TestUser",
             Email = "sometest@gmail.com",
@@ -30,7 +30,7 @@ public class AuthTests
     [Test]
     public async Task RegisterValidUser()
     {
-        var response = await client.PostAsJsonAsync("/api/auth/register", new RegistrationRequestDTO
+        var response = await client.PostAsJsonAsync("/api/auth/register", new RegistrationRequestDto
         {
             UserName = "NewUser",
             Email = "newUser@gmail.com",
@@ -43,7 +43,7 @@ public class AuthTests
     [Test]
     public async Task RegisterInvalidUser()
     {
-        var response = await client.PostAsJsonAsync("/api/auth/register", new RegistrationRequestDTO
+        var response = await client.PostAsJsonAsync("/api/auth/register", new RegistrationRequestDto
         {
             UserName = "",
             Email = "sometestgmail",
@@ -56,7 +56,7 @@ public class AuthTests
     [Test]
     public async Task LoginValidUser()
     {
-        var response = await client.PostAsJsonAsync("/api/auth/login", new RegistrationRequestDTO
+        var response = await client.PostAsJsonAsync("/api/auth/login", new RegistrationRequestDto
         {
             UserName = "TestUser",
             Email = "sometest@gmail.com",
@@ -69,7 +69,7 @@ public class AuthTests
     [Test]
     public async Task LoginInvalidUser()
     {
-        var response = await client.PostAsJsonAsync("/api/auth/login", new RegistrationRequestDTO
+        var response = await client.PostAsJsonAsync("/api/auth/login", new RegistrationRequestDto
         {
             UserName = "TestUser",
             Email = "sometest@gmail.com",

@@ -1,6 +1,7 @@
 namespace TodoListApi.Models.Data.DTO
+#nullable disable
 {
-    public class LoginRequestDTO
+    public class LoginRequestDto
     {
         public string UserName { get; set; }
         public string Email { get; set; }

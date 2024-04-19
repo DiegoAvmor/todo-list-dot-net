@@ -1,9 +1,9 @@
 namespace TodoListApi.Models.Data.DTO
 {
-    public class UserDTO
+    public class UserDto
     {
         public int Id { get; set; }
-        public string UserName { get; set; }
-        public string Email { get; set; }
+        public string? UserName { get; set; }
+        public string? Email { get; set; }
     }
 }

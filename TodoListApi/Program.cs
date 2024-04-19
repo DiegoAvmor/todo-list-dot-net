@@ -72,8 +72,8 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =
 builder.Services.AddValidatorsFromAssemblyContaining<TodoTaskValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
-builder.Services.AddScoped<IValidator<TodoTaskRequestDTO>, TodoTaskValidator>();
-builder.Services.AddScoped<IValidator<RegistrationRequestDTO>, UserValidator>();
+builder.Services.AddScoped<IValidator<TodoTaskRequestDto>, TodoTaskValidator>();
+builder.Services.AddScoped<IValidator<RegistrationRequestDto>, UserValidator>();
 
 //Setup Database Connection
 builder.Services.AddDbContext<TodoTaskDB>(

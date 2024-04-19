@@ -1,8 +1,9 @@
 namespace TodoListApi.Models.Data.DTO
+#nullable disable
 {
-    public class LoginResponseDTO
+    public class LoginResponseDto
     {
-        public UserDTO User { get; set; }
+        public UserDto User { get; set; }
         public string Token { get; set; }
         public string Type { get; set; } = "Bearer";
         

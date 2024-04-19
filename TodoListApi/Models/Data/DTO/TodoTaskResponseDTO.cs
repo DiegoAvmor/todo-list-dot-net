@@ -1,10 +1,11 @@
 namespace TodoListApi.Models.Data.DTO
+#nullable disable
 {
-    public class TodoTaskResponseDTO
+    public class TodoTaskResponseDto
     {
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public UserDTO user { get; set; }
+        public UserDto user { get; set; }
     }
 }

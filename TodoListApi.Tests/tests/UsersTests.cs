@@ -10,7 +10,7 @@ namespace TodoListApi.Tests
     {
         HttpClient client;
         string userToken;
-        UserDTO userDTO;
+        UserDto userDto;
 
         [SetUp]
         public async Task Setup(){
@@ -18,7 +18,7 @@ namespace TodoListApi.Tests
             var application = new WebApplicationFactory<Program>();
             client = application.CreateClient();
 
-            var user = new RegistrationRequestDTO
+            var user = new RegistrationRequestDto
             {
                 UserName = "TestUser",
                 Email = "sometest@gmail.com",
@@ -31,15 +31,9 @@ namespace TodoListApi.Tests
             //Authenticate user
             var userResponse = await client.PostAsJsonAsync("/api/auth/login", user);
             var userResult = await userResponse.Content.ReadAsStringAsync();
-            var responseUserToken = JsonConvert.DeserializeObject<LoginResponseDTO>(userResult);
-            userDTO = responseUserToken.User;
+            var responseUserToken = JsonConvert.DeserializeObject<LoginResponseDto>(userResult);
+            userDto = responseUserToken!.User;
             userToken = $"{responseUserToken.Type} {responseUserToken.Token}";
-
-            //Authenticate admin
-            //var adminResponse = await client.PostAsJsonAsync("/api/auth/login", admin);
-            //var adminResult = await adminResponse.Content.ReadAsStringAsync();
-            //var responseAdminToken = JsonConvert.DeserializeObject<LoginResponseDTO>(adminResult);
-            //adminToken = $"{responseAdminToken.Type} {responseAdminToken.Token}";
         }
 
         [TearDown]
@@ -52,14 +46,14 @@ namespace TodoListApi.Tests
         public async Task EditUserByOwner (){
             client.DefaultRequestHeaders.Add("Authorization", userToken);
 
-            RegistrationRequestDTO editedUserInformation = new RegistrationRequestDTO
+            RegistrationRequestDto editedUserInformation = new RegistrationRequestDto
             {
                 UserName = "HeyThisChanged!",
                 Email = "thischanged@gmail.com",
                 Password = "passwordChange!"
             };
 
-            var response = await client.PutAsJsonAsync($"/api/users/{userDTO.Id}", editedUserInformation);
+            var response = await client.PutAsJsonAsync($"/api/users/{userDto.Id}", editedUserInformation);
             Assert.NotNull(response);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
         }
@@ -68,14 +62,14 @@ namespace TodoListApi.Tests
         public async Task EditInvalidUserByOwner (){
             client.DefaultRequestHeaders.Add("Authorization", userToken);
 
-            RegistrationRequestDTO editedUserInformation = new RegistrationRequestDTO
+            RegistrationRequestDto editedUserInformation = new RegistrationRequestDto
             {
                 UserName = "HeyThisChanged!",
                 Email = "@gmail.com",
                 Password = "passwordChangeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA!"
             };
 
-            var response = await client.PutAsJsonAsync($"/api/users/{userDTO.Id}", editedUserInformation);
+            var response = await client.PutAsJsonAsync($"/api/users/{userDto.Id}", editedUserInformation);
             Assert.NotNull(response);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.UnprocessableEntity));
             
@@ -85,7 +79,7 @@ namespace TodoListApi.Tests
         public async Task EditNonExistentUserByOwner (){
             client.DefaultRequestHeaders.Add("Authorization", userToken);
 
-            RegistrationRequestDTO editedUserInformation = new RegistrationRequestDTO
+            RegistrationRequestDto editedUserInformation = new RegistrationRequestDto
             {
                 UserName = "HeyThisChanged!",
                 Email = "thischanged@gmail.com",
@@ -102,7 +96,7 @@ namespace TodoListApi.Tests
         public async Task DeleteExistentUserByOwner (){
             client.DefaultRequestHeaders.Add("Authorization", userToken);
 
-            var response = await client.DeleteAsync($"/api/users/{userDTO.Id}");
+            var response = await client.DeleteAsync($"/api/users/{userDto.Id}");
             Assert.NotNull(response);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
         }

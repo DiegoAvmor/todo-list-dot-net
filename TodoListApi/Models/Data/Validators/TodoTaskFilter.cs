@@ -3,7 +3,7 @@ using TodoListApi.Models.Data.DTO;
 
 namespace TodoListApi.Models.Data.Validators
 {
-    public class TodoTaskValidator : AbstractValidator<TodoTaskRequestDTO>
+    public class TodoTaskValidator : AbstractValidator<TodoTaskRequestDto>
     {
         public TodoTaskValidator(){
             RuleFor(x => x.Title)

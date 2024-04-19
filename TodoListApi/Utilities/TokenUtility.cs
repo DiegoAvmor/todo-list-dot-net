@@ -8,7 +8,7 @@ namespace TodoListApi.Utilities
 {
     public static class TokenUtility
     {
-        public static async Task<User> GetUserFromToken(ClaimsPrincipal claimsPrincipal, TodoTaskDB _db){
+        public static async Task<User?> GetUserFromToken(ClaimsPrincipal claimsPrincipal, TodoTaskDB _db){
             try
             {
                 string username = claimsPrincipal.Identity.Name;

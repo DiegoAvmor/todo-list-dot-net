@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-
+#nullable disable
 namespace TodoListApi.Models.Data
 {
     public class User

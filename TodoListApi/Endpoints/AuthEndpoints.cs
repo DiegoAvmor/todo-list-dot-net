@@ -25,16 +25,16 @@ namespace TodoListApi.Endpoints
             .WithOpenApi();
 
             LoginEndpoints.MapPost("/login", Login)
-            .Accepts<LoginRequestDTO>("application/json")
+            .Accepts<LoginRequestDto>("application/json")
             .Produces<IResult>(200).Produces(400).Produces(404);
 
             LoginEndpoints.MapPost("/register", Register)
-            .Accepts<RegistrationRequestDTO>("application/json")
+            .Accepts<RegistrationRequestDto>("application/json")
             .Produces<IResult>(200).Produces(400);
 
         }
 
-        static async Task<IResult> Login(AesEncryption _encryptUtility, ApplicationConfig _configuration, IMapper _map,[Validate] [FromBody] LoginRequestDTO requestDTO, TodoTaskDB _db){
+        static async Task<IResult> Login(AesEncryption _encryptUtility, ApplicationConfig _configuration, IMapper _map,[Validate] [FromBody] LoginRequestDto requestDTO, TodoTaskDB _db){
             User? user = await _db.Users.SingleOrDefaultAsync(x => x.UserName == requestDTO.UserName &&  x.Email == requestDTO.Email);
             if(user == null){
                 return Results.NotFound("Failed login attempt: User not found error.");
@@ -59,14 +59,14 @@ namespace TodoListApi.Endpoints
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            LoginResponseDTO loginResponseDTO  = new (){
-                User = _map.Map<UserDTO>(user),
+            LoginResponseDto LoginResponseDto  = new (){
+                User = _map.Map<UserDto>(user),
                 Token = tokenHandler.WriteToken(token)
             };
-            return Results.Ok(loginResponseDTO);
+            return Results.Ok(LoginResponseDto);
         }
 
-        static async Task<IResult> Register(AesEncryption _encryptUtility, IMapper _map, [Validate] [FromBody] RegistrationRequestDTO requestDTO, TodoTaskDB _db){
+        static async Task<IResult> Register(AesEncryption _encryptUtility, IMapper _map, [Validate] [FromBody] RegistrationRequestDto requestDTO, TodoTaskDB _db){
             if(await _db.Users.FirstOrDefaultAsync(x => x.Email == requestDTO.Email && x.UserName ==requestDTO.UserName ) != null){
                 return Results.BadRequest("Failed user registration: Usernamer or email already exists.");
             }
@@ -77,8 +77,8 @@ namespace TodoListApi.Endpoints
 
             _db.Users.Add(newUser);
             _db.SaveChanges();
-            UserDTO newUserDTO = _map.Map<UserDTO>(newUser);
-            return Results.Ok(newUserDTO);
+            UserDto newUserDto = _map.Map<UserDto>(newUser);
+            return Results.Ok(newUserDto);
         }
         
     }

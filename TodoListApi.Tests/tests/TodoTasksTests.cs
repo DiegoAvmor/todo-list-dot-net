@@ -10,7 +10,7 @@ namespace TodoListApi.Tests
     {
         HttpClient client;
         string token;
-        TodoTaskRequestDTO task = new TodoTaskRequestDTO
+        readonly TodoTaskRequestDto task = new TodoTaskRequestDto
         {
             Title = "This is a dummy task",
             Description = "This is a dummy description"
@@ -21,7 +21,7 @@ namespace TodoListApi.Tests
         public async Task Setup(){
             var application = new WebApplicationFactory<Program>();
             client = application.CreateClient();
-            var user = new RegistrationRequestDTO
+            var user = new RegistrationRequestDto
             {
                 UserName = "TestUser",
                 Email = "sometest@gmail.com",
@@ -34,8 +34,8 @@ namespace TodoListApi.Tests
             var response = await client.PostAsJsonAsync("/api/auth/login", user);
             var result = await response.Content.ReadAsStringAsync();
 
-            var responseToken = JsonConvert.DeserializeObject<LoginResponseDTO>(result);
-            token = $"{responseToken.Type} {responseToken.Token}";
+            var responseToken = JsonConvert.DeserializeObject<LoginResponseDto>(result);
+            token = $"{responseToken!.Type} {responseToken.Token}";
         }
 
         [TearDown]
@@ -53,8 +53,8 @@ namespace TodoListApi.Tests
             Assert.NotNull(response);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             var result = await response.Content.ReadAsStringAsync();
-            var deserializedResponse = JsonConvert.DeserializeObject<List<TodoTaskResponseDTO>>(result);
-            Assert.That(deserializedResponse.Count, Is.GreaterThan(0));
+            var deserializedResponse = JsonConvert.DeserializeObject<List<TodoTaskResponseDto>>(result);
+            Assert.That(deserializedResponse!.Count, Is.GreaterThan(0));
         }
 
         [Test]
@@ -63,14 +63,14 @@ namespace TodoListApi.Tests
             client.DefaultRequestHeaders.Add("Authorization", token);
             var createdTask = await client.PostAsJsonAsync("/api/tasks", task);
             var createdTaskResult = await createdTask.Content.ReadAsStringAsync();
-            var todoTaskResponseDTO = JsonConvert.DeserializeObject<TodoTaskResponseDTO>(createdTaskResult);
+            var todoTaskResponseDto = JsonConvert.DeserializeObject<TodoTaskResponseDto>(createdTaskResult);
 
-            var response = await client.GetAsync($"/api/{todoTaskResponseDTO.Id}/task");
+            var response = await client.GetAsync($"/api/{todoTaskResponseDto!.Id}/task");
             Assert.NotNull(response);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             var result = await response.Content.ReadAsStringAsync();
-            var deserializedResponse = JsonConvert.DeserializeObject<TodoTaskResponseDTO>(result);
-            Assert.That(deserializedResponse.Id, Is.EqualTo(todoTaskResponseDTO.Id));
+            var deserializedResponse = JsonConvert.DeserializeObject<TodoTaskResponseDto>(result);
+            Assert.That(deserializedResponse!.Id, Is.EqualTo(todoTaskResponseDto.Id));
         }
 
         [Test]
@@ -79,12 +79,12 @@ namespace TodoListApi.Tests
             client.DefaultRequestHeaders.Add("Authorization", token);
             var createdTask = await client.PostAsJsonAsync("/api/tasks", task);
             var createdTaskResult = await createdTask.Content.ReadAsStringAsync();
-            var todoTaskResponseDTO = JsonConvert.DeserializeObject<TodoTaskResponseDTO>(createdTaskResult);
+            var todoTaskResponseDto = JsonConvert.DeserializeObject<TodoTaskResponseDto>(createdTaskResult);
 
             task.Title = "This title changed!";
             task.Description = "Hi this is a changed description!";
 
-            var response = await client.PutAsJsonAsync($"/api/{todoTaskResponseDTO.Id}/task", task);
+            var response = await client.PutAsJsonAsync($"/api/{todoTaskResponseDto!.Id}/task", task);
             Assert.NotNull(response);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
         }
@@ -95,9 +95,9 @@ namespace TodoListApi.Tests
             client.DefaultRequestHeaders.Add("Authorization", token);
             var createdTask = await client.PostAsJsonAsync("/api/tasks", task);
             var createdTaskResult = await createdTask.Content.ReadAsStringAsync();
-            var todoTaskResponseDTO = JsonConvert.DeserializeObject<TodoTaskResponseDTO>(createdTaskResult);
+            var todoTaskResponseDto = JsonConvert.DeserializeObject<TodoTaskResponseDto>(createdTaskResult);
 
-            var response = await client.DeleteAsync($"/api/{todoTaskResponseDTO.Id}/task");
+            var response = await client.DeleteAsync($"/api/{todoTaskResponseDto!.Id}/task");
             Assert.NotNull(response);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
         }

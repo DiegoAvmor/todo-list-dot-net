@@ -38,9 +38,9 @@ namespace TodoListApi.Endpoints
             .Produces<IResult>(204).Produces(404);
         }
 
-        static async Task<IResult> CreateTask(IMapper _map, [Validate] [FromBody] TodoTaskRequestDTO requestDTO, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db)
+        static async Task<IResult> CreateTask(IMapper _map, [Validate] [FromBody] TodoTaskRequestDto requestDto, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db)
         {
-            User user = await TokenUtility.GetUserFromToken(claimsPrincipal, _db);
+            User? user = await TokenUtility.GetUserFromToken(claimsPrincipal, _db);
             if (user == null){
                 Log.Error("User in token not found, invalid user.");
                 return Results.Conflict("It wasnt possible to retrieved the data from the user");
@@ -48,12 +48,12 @@ namespace TodoListApi.Endpoints
             Log.Information($"Creating new task for user: {user.UserName}");
             try
             {
-                TodoTask newTask = _map.Map<TodoTask>(requestDTO);
+                TodoTask newTask = _map.Map<TodoTask>(requestDto);
                 newTask.UserId = user.Id;
                 _db.TodoTasks.Add(newTask);
                 await _db.SaveChangesAsync();
                 Log.Information($"New task created with id:{newTask.Id}");
-                return Results.Ok(_map.Map<TodoTaskResponseDTO>(newTask));
+                return Results.Ok(_map.Map<TodoTaskResponseDto>(newTask));
             }
             catch (Exception e)
             {
@@ -63,7 +63,7 @@ namespace TodoListApi.Endpoints
         }
 
         static async Task<IResult> GetTasks(IMapper _map, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db){
-            User user = await TokenUtility.GetUserFromToken(claimsPrincipal, _db);
+            User? user = await TokenUtility.GetUserFromToken(claimsPrincipal, _db);
             if (user == null){
                 Log.Error("User in token not found, invalid user.");
                 return Results.Conflict("It wasnt possible to retrieved the data from the user");
@@ -78,13 +78,13 @@ namespace TodoListApi.Endpoints
                 return Results.Ok(todoTasks);
             }
             Log.Information($"Tasks obtained size: {todoTasks.Count}");
-            List<TodoTaskResponseDTO> userTodoTasks = _map.Map<List<TodoTaskResponseDTO>>(todoTasks);      
+            List<TodoTaskResponseDto> userTodoTasks = _map.Map<List<TodoTaskResponseDto>>(todoTasks);      
             return Results.Ok(userTodoTasks);
         }
 
         static async Task<IResult> GetTaskById(int id, ClaimsPrincipal claimsPrincipal, IMapper _map, TodoTaskDB _db){
             //Check if the task owner is the user from the token
-            User user = await TokenUtility.GetUserFromToken(claimsPrincipal, _db);
+            User? user = await TokenUtility.GetUserFromToken(claimsPrincipal, _db);
              if (user == null){
                 return Results.Conflict("It wasnt possible to retrieved the data from the user");
             }
@@ -92,12 +92,12 @@ namespace TodoListApi.Endpoints
             if (todoTask ==null){
                 return Results.NotFound($"Task with id {id} not found");
             }
-            return Results.Ok(_map.Map<TodoTaskResponseDTO>(todoTask));
+            return Results.Ok(_map.Map<TodoTaskResponseDto>(todoTask));
         }
 
         static async Task<IResult> DeleteTaskById(int id, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db) {
             //Check if the task owner is the user from the token
-            User user = await TokenUtility.GetUserFromToken(claimsPrincipal, _db);
+            User? user = await TokenUtility.GetUserFromToken(claimsPrincipal, _db);
              if (user == null){
                 return Results.Conflict("It wasnt possible to retrieved the data from the user");
             }
@@ -114,9 +114,9 @@ namespace TodoListApi.Endpoints
             return Results.NotFound($"Task with id {id} not found");
         }
 
-        static async Task<IResult> UpdateTaskById(int id, [Validate] [FromBody] TodoTaskRequestDTO requestDTO, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db) {
+        static async Task<IResult> UpdateTaskById(int id, [Validate] [FromBody] TodoTaskRequestDto requestDto, ClaimsPrincipal claimsPrincipal, TodoTaskDB _db) {
             //Check if the task owner is the user from the token
-            User user = await TokenUtility.GetUserFromToken(claimsPrincipal, _db);
+            User? user = await TokenUtility.GetUserFromToken(claimsPrincipal, _db);
             if (user == null){
                 return Results.Conflict("It wasnt possible to retrieved the data from the user");
             }
@@ -124,8 +124,8 @@ namespace TodoListApi.Endpoints
             if (await _db.TodoTasks.FindAsync(id) is TodoTask todo)
             {
                 if (todo.UserId == user.Id){
-                    todo.Title = requestDTO.Title;
-                    todo.Description = requestDTO.Description;
+                    todo.Title = requestDto.Title;
+                    todo.Description = requestDto.Description;
                     await _db.SaveChangesAsync();
                     return Results.NoContent();
                 }
