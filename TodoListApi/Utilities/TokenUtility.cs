@@ -11,7 +11,7 @@ namespace TodoListApi.Utilities
         public static async Task<User?> GetUserFromToken(ClaimsPrincipal claimsPrincipal, TodoTaskDB _db){
             try
             {
-                string username = claimsPrincipal.Identity.Name;
+                string? username = claimsPrincipal.Identity?.Name;
                 if (string.IsNullOrEmpty(username)){
                     throw new Exception($"No Username '{username}' associated in JWT");
                 }

@@ -14,6 +14,9 @@ using TodoListApi.Models.DB;
 using TodoListApi.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
 
 //Setup Mapping from appsettings.json to the ApplicationConfig class
 var appConfig = new ApplicationConfig();
@@ -111,7 +114,7 @@ builder.Services.AddAuthorization(options => {
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Local"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();
