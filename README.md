@@ -4,6 +4,16 @@ Before you begin, make sure you have the following installed:
 - .NET SDK (version 5.0 or later)
 - Visual Studio or Visual Studio Code
 
+## If using Visual Studio Code:
+Install the following extensions as they are required for working with .Net:
+- [C# Dev Kit](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit) **(Required)**
+- [.NET Extension Pack](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.vscode-dotnet-pack) **(Required)**
+- [ASP.NET core VS Code Extension Pack](https://marketplace.visualstudio.com/items?itemName=temilaj.asp-net-core-vs-code-extension-pack) **(Optional but good to have)**
+- [C# Extensions](https://marketplace.visualstudio.com/items?itemName=jchannon.csharpextensions) *(Optional)*
+- [C# Namespace Autocompletion](https://marketplace.visualstudio.com/items?itemName=adrianwilczynski.namespace) *(Optional)*
+- [Entity Framework](https://marketplace.visualstudio.com/items?itemName=richardwillis.vscode-entity-framework) **(Optional but good to have)**
+- [IntelliCode for C# Dev Kit](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.vscodeintellicode-csharp) *(Optional)*
+
 # Getting Started
 Clone the Repository:
 ```
